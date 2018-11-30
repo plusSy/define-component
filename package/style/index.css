@@ -1,0 +1,48 @@
+@import "graphic.css";
+
+html{
+  box-sizing: border-box;
+  -ms-overflow-style: scrollbar; /* -- */
+}
+
+body {
+  font-size: 12px;
+}
+
+*,*:after,*:before {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.grid-row {
+  display: flex;
+  display: -webkit-flex;
+  display: -ms-flex;
+  -ms-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.grid-row .layout {
+  width: 100%;
+  overflow: auto;
+  flex-wrap: nowrap;
+}
+
+.grid-row .grid-row__center {
+  justify-content: center;
+}
+.grid-row .grid-row__start {
+  justify-content: flex-start;
+}
+.grid-row .grid-row__end {
+  justify-content: flex-end;
+}
+.grid-row .grid-row__between {
+  justify-content: space-between;
+}
+.grid-row .grid-row__around {
+  justify-content: space-around;
+}
+
