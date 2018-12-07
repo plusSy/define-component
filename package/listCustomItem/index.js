@@ -1,14 +1,14 @@
 /**
- * 石一龙
- * 滑动 slide
+ * Candice
+ * 列表定制元素 一行两列listItem
  * 2018/11/14
  */
-import OcjSlide from './slide.vue'
+import OcjListCustomItem from './listCustomItem.vue'
 
 const components = [
-  OcjSlide
+  OcjListCustomItem
 ]
-const slideInit = {
+const listCustomItemInstall = {
   install: function (Vue) {
     components.map(function (item) {
       Vue.component(item.name, item)
@@ -19,4 +19,4 @@ const slideInit = {
   }
 }
 
-export default slideInit
+export default listCustomItemInstall

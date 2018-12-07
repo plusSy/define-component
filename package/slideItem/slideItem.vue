@@ -6,11 +6,11 @@
 
 <script>
 export default {
-  name: 'slideItem',
+  name: 'OcjSlideItem',
   props: {
     itemWidth: {
       type: [Number, String],
-      default: 375
+      default: 0
     }
   },
   computed: {

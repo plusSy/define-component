@@ -1,137 +1,217 @@
 <template>
-  <div
-    class="carousel"
-    @touchstart="touchstart"
-    @touchmove="touchmove"
-    @touchend="touchend"
-    @mouseenter="hoverFn"
-    @mouseleave="hoverFn"
-    :style="carouselStyle"
-    :class="{carouselClass}"
-  >
-    <div
-      class="imgs-container"
-      :style="`
-        width: ${len * 100}%;
-        transform: translate(-${ activeIndex * 100 / len }%);
-        transition: ${ isResetIndex ? '' : transitionInterval / 1000 }s ease;
-      `"
-    >
-    <!-- transition-duration: 1s; -->
-      <a
-        class="img-item"
-        v-for="(img, i) in imgsComputed"
-        :style="`
-          width: ${100 / len}%;
-          backgroundImage: url(${img.src});
-        `"
-        :href="img.href ? img.href : false"
-        :key="i"
-      ></a>
+  <div class="groups" ref="groups" :style="`height: ${height}px;`">
+    <div :class="['group']" :style="groupStyle">
+      <div
+        :style="slideStyle"
+        @touchstart="onTouchstart"
+        @touchmove="onTouchmove"
+        @touchend="onTouchend">
+        <div v-for="(item, key) in localData" :key="key" :style="groupItemStyle">
+          <img :style="imgStyle" :src="item.src" alt="">
+        </div>
+      </div>
     </div>
-
     <template v-if="controllable">
-      <div class="prev" @click="switchFn" onselectstart="return false">&lt;</div>
-      <div class="next" @click="switchFn" onselectstart="return false">&gt;</div>
+      <div class="prev" @click="prev" onselectstart="return false">&lt;</div>
+      <div class="next" @click="next" onselectstart="return false">&gt;</div>
     </template>
-
-    <ul class="dots" @click="activeDotFn" v-if="showDocts">
-      <li
-        class="dot"
-        v-for="n in (len-2)"
-        :key="n"
-        :data-dot-index="n"
-        :class="{'active-dot': activeIndex === n || (activeIndex === (len-1) && n === 1) || (activeIndex === 0 && n === 5)}"
-      ></li>
-    </ul>
+    <template v-if="showDocts">
+      <ul class="dots" @click="activeDotFn">
+        <li
+          class="dot"
+          v-for="n in (len - 2)"
+          :key="n"
+          :data-dot-index="n"
+          :class="{'active-dot': activeIndex === n || (activeIndex === (len-1) && n === 1) || (activeIndex === 0 && n === (len - 2))}"
+        ></li>
+      </ul>
+    </template>
   </div>
 </template>
-
 <script>
-import { pixelToRem } from '../rem'
+import TouchHelper from '../utils/touch'
 
 export default {
-  name: 'carousel',
+  name: 'OcjCarousel',
+  data () {
+    return {
+      transformX: 0,
+      continueAnimate: true,
+      touchStartX: 0,
+      touchMoveX: 0,
+      touchStartLeft: 0,
+      touchFount: true, // true index 减小 往前 手指往右 false index 增加 往后 手指往左
+      groupWidth: 0,
+      groupHeight: 0,
+      activeIndex: 0,
+      localData: [],
+      timer: null,
+      isTransitioning: false // 是否正在过度动画
+    }
+  },
+  computed: {
+    $Touch () {
+      return new TouchHelper()
+    },
+    len () {
+      return this.localData.length
+    },
+    groupStyle () {
+      return {
+        fontSize: '16px',
+        width: (this.len * this.groupWidth) + 'px',
+        height: this.groupHeight || this.height + 'px'
+      }
+    },
+    groupItemStyle () {
+      return {
+        width: this.groupWidth + 'px',
+        display: 'inline-block',
+        lineHeight: this.groupHeight + 'px',
+        height: this.groupHeight || this.height + 'px'
+      }
+    },
+    slideStyle () {
+      return {
+        transition: `${this.continueAnimate ? this.interval / 1000 : 0}s ease`,
+        transform: `translate3d(${this.transformX}px , 0px, 0px)`
+      }
+    },
+    imgStyle () {
+      return {
+        width: this.groupWidth + 'px',
+        height: this.groupHeight || this.height + 'px',
+        display: 'inline-block'
+      }
+    }
+  },
   props: {
-    imgs: {
+    injectData: {
       type: Array,
-      required: true
+      default: () => {
+        return []
+      }
     },
-    /* 定时间隔 */
-    interval: {
-      type: [Number, String],
-      default: 5000
-    },
-    height: {
-      type: [Number, String],
-      default: 200
-    },
-    /* 左右的控制器 */
     controllable: {
       type: Boolean,
       default: false
     },
-    /* 展示dots */
+    // 步进个数
+    step: {
+      type: [Number],
+      default: 1
+    },
     showDocts: {
       type: Boolean,
       default: true
     },
-    /* 是否自动轮播 */
-    autoPlay: {
-      type: [Boolean, String],
-      default: true
+    // 当前第几页
+    currentPage: {
+      type: [String, Number],
+      default: 3
     },
-    /* 过渡动画时长 */
-    transitionInterval: {
+    // 定时间隔
+    interval: {
       type: [Number, String],
       default: 500
     },
-    /* 当前显示第几张 */
-    currentPage: {
-      type: [Number, String],
-      default: 1
+    // 自动播放
+    autoPlay: {
+      type: Boolean,
+      default: false
     },
-    /* class */
-    carouselClass: {
-      type: Object,
-      default: () => {
-        return {}
-      }
+    height: {
+      type: [String, Number],
+      default: 150
     }
   },
-  data () {
-    return {
-      timer: null, // 自动播放的定时器
-      isTransitioning: false, // 是否处于过度动画执行期间
-      isResetIndex: false, // 是否为瞬间重置定位，在watch中初始化，重定位会取消transition动画
-      activeIndex: this.currentPage,
-      startPos: {}, // 开始位置
-      endPos: {}, // 结束位置
-      scrollDirection: 0, // 滚动方向
-      touch: {} // 记录触碰节点
-    }
+  created () {
+    this.init()
+    this.activeIndex = this.currentPage
   },
-  computed: {
-    // 为了无缝滚动，在传进来的imgs数组首部增加末尾元素，在尾部追加首元素
-    imgsComputed () {
-      var firstImg = this.imgs[0]
-      var lastImg = this.imgs[this.imgs.length - 1]
-      return [lastImg].concat(this.imgs, [firstImg])
-    },
-    len () {
-      return this.imgsComputed.length
-    },
-    carouselStyle () {
-      return `
-        height: ${pixelToRem(this.height)}rem;
-      `
-    }
-  },
-  beforeDestory () {
-    clearInterval(this.timer)
+  mounted () {
+    this.groupWidth = this.$refs.groups.offsetWidth
+    this.groupHeight = this.$refs.groups.offsetHeight
+    this.transformX = -this.activeIndex * this.groupWidth * 1
+    this.startInterval()
   },
   methods: {
+    init () {
+      this.localData = [this.injectData[this.injectData.length - 1]].concat(this.injectData, [this.injectData[0]])
+    },
+    // 阻止事件冒泡
+    prevent (e) {
+      e.stopImmediatePropagation()
+      e.stopPropagation()
+    },
+    onTouchstart (event) {
+      if (this.isTransitioning) return
+      if (this.timer) clearInterval(this.timer)
+      this.$Touch.touchStart(event)
+      // alert('start ---')
+      // 停止动画
+      this.continueAnimate = false
+      this.touchStartX = this.$Touch.startX
+      this.touchStartLeft = this.transformX
+    },
+    onTouchmove (event) {
+      if (this.isTransitioning) return
+      this.$Touch.touchMove(event)
+      this.touchMoveX = this.$Touch.deltaX
+      this.touchFount = this.touchMoveX > 0
+      this.transformX = this.touchStartLeft + this.touchMoveX
+    },
+    onTouchend (event) {
+      let moveX = this.$Touch.offsetX
+      let w = event.target.offsetWidth
+      // 移动长度限定
+      if (moveX > w * 0.25) {
+        if (this.touchFount) {
+          this.activeIndex -= Math.ceil(Number(moveX / w))
+          if (this.activeIndex < 0) {
+            this.activeIndex = 0
+          }
+        } else {
+          this.activeIndex += Math.ceil(Number(moveX / w))
+          if (this.activeIndex > this.len - 1) {
+            this.activeIndex = Number(this.len - 1)
+          }
+        }
+      }
+      // 开放延迟动画
+      this.continueAnimate = true
+      this.stepMove()
+      // 自动播放
+      this.startInterval()
+    },
+    stepMove () {
+      let w = this.groupWidth
+      this.transformX = 0 - (this.activeIndex * w)
+      this.touchMoveX = 0
+    },
+    // 上一步
+    prev () {
+      if (this.isTransitioning) return
+      this.activeIndex -= this.step
+      this.continueAnimate = this.activeIndex > 0
+      if (this.activeIndex < 0) {
+        this.activeIndex = this.len - 1
+      }
+      this.startInterval()
+    },
+    // 下一步
+    next () {
+      if (this.isTransitioning) return
+      this.activeIndex = this.activeIndex + this.step
+      this.continueAnimate = this.activeIndex < this.len
+      if (this.activeIndex > this.len - 1) {
+        this.activeIndex = 0
+      }
+      this.startInterval()
+    },
+    // dot 切换item
     activeDotFn (e) {
+      if (this.isTransitioning) return
       if (this.timer) clearInterval(this.timer)
       if (e.target.tagName.toLowerCase() === 'li') {
         let index = parseInt(e.target.getAttribute('data-dot-index'))
@@ -139,111 +219,53 @@ export default {
       }
       this.startInterval()
     },
-    switchFn (e) {
-      if (this.isTransitioning) return // 动画过渡中不可以进行切换
-      // 对activeIndex进行操作
-      e.target.className.indexOf('next') !== -1 ? this.activeIndex++ : this.activeIndex--
-    },
-    startInterval () { // 启动自动轮播函数
+    // 自动轮播
+    startInterval () {
+      if (this.timer) clearInterval(this.timer)
       if (this.autoPlay) {
         this.timer = setInterval(() => {
-          // 对activeIndex进行操作
           this.activeIndex++
         }, this.interval)
       }
-    },
-    hoverFn (e) { // 鼠标移入暂停轮播，移出恢复轮播
-      if (e.type === 'mouseenter') {
-        if (this.timer) clearInterval(this.timer)
-      } else {
-        this.startInterval()
-      }
-    },
-    touchstart (e) {
-      if (this.timer) clearInterval(this.timer)
-      this.touch = e.targetTouches[0] // 取得第一个touch的坐标值
-      this.startPos = {x: this.touch.pageX, y: this.touch.pageY}
-      this.scrollDirection = 0
-    },
-    touchmove (e) {
-      let { touch, startPos } = this
-      let currentWidth = e.currentTarget.clientWidth / 4
-      // 如果有多个地方滑动，我们就不发生这个事件
-      if (event.targetTouches.length > 1) {
-        return
-      }
-      touch = e.targetTouches[0]
-      this.endPos = {x: touch.pageX, y: touch.pageY}
-      // 判断滑动距离超过当前元素的25%计算出滑动方向，向右为1，向左为-1
-      this.scrollDirection = touch.pageX - startPos.x > currentWidth ? 1 : touch.pageX - startPos.x < -currentWidth ? -1 : 0
-    },
-    touchend (e) {
-      let { scrollDirection, activeIndex, imgs } = this
-      let index = activeIndex
-      if (scrollDirection === 1) {
-        if (index >= 1 && index <= imgs.length) {
-          this.activeIndex--
-        }
-      } else if (scrollDirection === -1) {
-        if (index >= 0 && index <= imgs.length) {
-          this.activeIndex++
-        }
-      }
-      this.startInterval()
     }
   },
-  mounted () {
-    this.startInterval() // 启动自动轮播
+  beforeDestory () {
+    clearInterval(this.timer)
   },
   watch: {
-    activeIndex (newActiveIndex, oldActiveIndex) {
-      // 监听activeIndex的变化，当activeIndex到达边界的时候进行复位
-      if ((newActiveIndex === 1 && oldActiveIndex === (this.len - 1)) || (oldActiveIndex === 0 && newActiveIndex === this.len - 2)) {
-        this.isResetIndex = true
+    activeIndex (newIdx, oldIdx) {
+      // 页面初始化 | loop时候 取消动画
+      if ((newIdx === 1 && oldIdx === (this.len - 1)) || (oldIdx === 0 && newIdx === this.len - 2) || (newIdx === this.currentPage && oldIdx === 0)) {
+        this.continueAnimate = false
         return
       }
-      this.isResetIndex = false
-      this.isTransitioning = true // 为true时表示正在进行transition过渡中，不可以进行切换轮播
+      this.continueAnimate = true
+      this.isTransitioning = true
+      this.stepMove()
       setTimeout(() => {
-        // 瞬间归位需要取消transition过渡
-        // 以下两种情况是瞬间归位时activeIndex变化
         if (this.activeIndex === 0) {
           this.activeIndex = this.len - 2
+          this.transformX = -this.activeIndex * this.groupWidth * 1
         } else if (this.activeIndex === (this.len - 1)) {
           this.activeIndex = 1
+          this.transformX = -this.activeIndex * this.groupWidth * 1
         }
-        this.isTransitioning = false // 为false时表示transition过渡结束，可以进行切换轮播
-      }, this.transitionInterval)
+        this.isTransitioning = false
+      }, this.interval)
     }
   }
 }
 </script>
-
 <style lang="css" scoped>
-.carousel {
+.groups{
+  width: 100%;
   overflow: hidden;
   position: relative;
-  margin: 0 auto;
 }
-.carousel:hover .prev,
-.next {
-  display: block;
-}
-
-.imgs-container {
+.group{
   height: 100%;
 }
-
-.img-item {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  background: #ccc no-repeat center/cover;
-  line-height: 16;
-}
-
-.prev,
-.next {
+.prev,.next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -282,7 +304,10 @@ export default {
   margin-right: 0px;
 }
 .active-dot {
-  background-color: rgba(122, 117, 117, 0.8);
-  transition: 500ms;
+  background-color:red;
+  transition: 200ms;
+}
+.image-class{
+
 }
 </style>

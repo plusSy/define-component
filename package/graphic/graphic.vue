@@ -1,12 +1,19 @@
 <template>
-  <div class="graphic" :style="graphicStyle">
-    <grid-row padding="0"> <!-- 放开限制 -->
-      <grid-col-pixel @click="handleClick(item)" v-for="(item, key) in localData[localDataKey.listKey]" :key="key" :width="pixelWidth" :height="rowHeight">
-        <div class="pic">
+  <div class="ocj-graphic">
+    <grid-row :padding="padding">
+      <grid-col-pixel
+        v-for="(item, key) in localData[localDataKey.listKey]"
+        :key="key"
+        :width="pixelWidth"
+        :height="rowHeight"
+        v-if="key < numForOneRow"
+        @click="handleClick(item)">
+        <div class="pic" :ref="`pica`">
           <img :class="`pic__img ${imgClass}`" :style="itemImageSize" :src="item[localDataKey.picKey]" :alt="item[localDataKey.titleKey]">
         </div>
-        <div class="text" v-if="showText">
-          <div :class="`text__title ${imgClass}`" :style="titleStyle">{{ item[localDataKey.titleKey] }}</div>
+        <div class="text" :style="textStyle" v-if="showText">
+          <!-- <img :src="item[localDataKey.picKey]" width="10" height="10"> -->
+          <div :class="`text__title ${textClass}`" :style="titleStyle">{{ item[localDataKey.titleKey] }}</div>
         </div>
       </grid-col-pixel>
     </grid-row>
@@ -14,11 +21,10 @@
 </template>
 
 <script>
-// rem 配置 提出到 util
 import { remConfig, pixelToRem } from '../rem'
 
 export default {
-  name: 'Graphic',
+  name: 'OcjGraphic',
   components: {
     gridColGrid: () => import('../grid/col-grid'),
     gridColPercent: () => import('../grid/col-percent'),
@@ -29,7 +35,7 @@ export default {
     return {
       /* 组件内数据 */
       localData: {},
-      /* 默认key配置 todo 根据config文件配置 */
+      /* 默认key配置 */
       localDataKey: {
         listKey: 'list',
         picKey: 'firstImgUrl',
@@ -51,12 +57,12 @@ export default {
     /* 一行商品数量 */
     numForOneRow: {
       type: [Number, String],
-      default: 2 // todo 根据config文件配置
+      default: 2
     },
     /* 行高 */
     rowHeight: {
       type: [Number, String],
-      default: 105 // todo 根据config文件配置
+      default: 105
     },
     /* 展示文字 */
     showText: {
@@ -82,6 +88,21 @@ export default {
     textClass: {
       type: [String],
       default: () => ''
+    },
+    /* 左右的偏移 */
+    padding: {
+      type: [String, Number],
+      default: () => 0
+    },
+    /* 字体大小 */
+    fontSize: {
+      type: [Number, String],
+      default: () => 12
+    },
+    /* 字体颜色 */
+    color: {
+      type: String,
+      default: () => ''
     }
   },
   computed: {
@@ -106,13 +127,16 @@ export default {
         height: ${(height / remConfig.designWidth) * remConfig.remProportion}rem
       `
     },
-    graphicStyle () {
-      return ``
+    textStyle () {
+      return {
+        width: pixelToRem((remConfig.designWidth - this.padding * 2) / this.numForOneRow) + 'rem'
+      }
     },
     titleStyle () {
-      return `
-        font-size: ${pixelToRem(12)}rem;
-      `
+      return {
+        fontSize: pixelToRem(this.fontSize) + 'rem',
+        color: this.color
+      }
     }
   },
   methods: {
@@ -128,13 +152,14 @@ export default {
   },
   created () {
     this.init()
-  },
-  mounted () {},
-  watch: {}
+  }
 }
 </script>
 
 <style lang="css" scoped>
+.ocj-graphic{
+  overflow: hidden;
+}
 .pic {
   width: 100%;
 }
@@ -145,7 +170,7 @@ export default {
 
 .text {
   text-align: left;
-  padding: 0 5px;
+  position: absolute;
 }
 
 .text__title {
@@ -157,5 +182,11 @@ export default {
   font-family: PingFangSC-Regular;
   color: #414141;
   text-align: center;
+}
+.grid-row{
+  flex-wrap: nowrap;
+}
+.grid-col{
+  position: relative;
 }
 </style>

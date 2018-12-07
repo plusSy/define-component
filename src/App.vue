@@ -1,23 +1,34 @@
 <template>
   <div id="app">
     <!-- <ocj-date-picker :value="currentDate"></ocj-date-picker> -->
-    <ocj-side-menu  ref="sideMenu" :wrapTarget="wrapTarget" :menuList="menuList" @closeMenu="closeMenu" @openMenu="openMenu"></ocj-side-menu>
-    <ocj-modal ref="modal" direction="right" :wrapTarget="wrapTarget" @closeModal="closeModal" @openModal="openModal">
+    <ocj-side-menu  ref="sideMenu" direction="right" :wrapTarget="wrapTarget" :menuList="menuList" @closeMenu="closeMenu" @openMenu="openMenu"></ocj-side-menu>
+    <ocj-modal ref="modal" direction="right" backgroundColor="#ffffff" :wrapTarget="wrapTarget" @closeModal="closeModal" @openModal="openModal">
       <button @click="headerFilterHandler">过滤条件</button>
     </ocj-modal>
     <div id="page-wrap">
-      <ocj-header @headerMenuHandler="headerMenuHandler" @headerSearchHandler="headerSearchHandler" @headerFilterHandler="headerFilterHandler">
+      <ocj-header ref="header" @headerMenuHandler="headerMenuHandler" @headerSearchHandler="headerSearchHandler" @headerFilterHandler="headerFilterHandler">
         内容维护
+        <div slot="more">
+          <div style="height: 30px; border-bottom: 1px solid #e0e0e0;line-height: 30px;" @click="testHandler">测试</div>
+          <div style="height: 30px; line-height: 30px;">跳转</div>
+        </div>
       </ocj-header>
       <div class="container">
-        <ocj-tabs :currentTab="currentTab" :tabs="tabs" :sticky="true" :scrollable="false"></ocj-tabs>
-        <!-- <OcjMock :injectData="{list: list}"></OcjMock> -->
-        <!-- <OcjCarousel :imgs="list" height="200" interval="3000" showDocts currentPage="2" autoPlay></OcjCarousel> -->
-        <!-- <ocj-slide height="150">
+        <!-- <ocj-tabs :currentTab="currentTab" :tabs="tabs" :sticky="true" :scrollable="false"></ocj-tabs> -->
+        <ocj-tabs :sticky="true" :scrollable="false" @tab-click="tabClick">
+          <ocj-tab value="baseInfo"><span slot="label"><img src="./assets/stop.png"/>基础配置</span></ocj-tab>
+          <ocj-tab value="attr" label="属性设置" :disabled="false">属性设置</ocj-tab>
+          <!-- <ocj-tab value="attr1" label="基础配置1"></ocj-tab>
+          <ocj-tab value="attr2" label="属性设置1"></ocj-tab>
+          <ocj-tab value="attr3" label="属性设置3"></ocj-tab> -->
+        </ocj-tabs>
+        <!-- <OcjMock :injectData="{list: list}"></OcjMock>
+        <OcjCarousel :injectData="list" height="200" interval="2000" showDocts></OcjCarousel> -->
+        <ocj-slide height="150" scrollType="progress">
           <ocj-slide-item v-for="(item, index) in list" :key="index" :item-width="100">
             <div class="item-class">{{ item.title }}</div>
           </ocj-slide-item>
-        </ocj-slide> -->
+        </ocj-slide>
 
         <ocj-card-swipe :height="150" :loop="true" :showIndicators="false" indicatorClass="indicatorClass">
           <ocj-card-item v-for="(number, nIdx) in 5" :key="nIdx">
@@ -29,6 +40,12 @@
         <ocj-date-picker :value="currentDate" :single="false" :autoComplete="true"></ocj-date-picker>
         <ocj-table :border="true" :data="tableList" :columns="columns"></ocj-table>
         <ocj-list>
+          <ocj-list-custom-item :hasSliding="true">
+            <div slot="left">
+              <div>*太神了！</div>
+            </div>
+            <div slot="right"><input placeholder="请输入内容"/></div>
+          </ocj-list-custom-item>
           <ocj-list-item v-for="(item, index) in tableList" :key="index" :hasSliding="true">
             <div>{{item.title}}{{item.title}}{{item.title}}{{item.title}}{{item.title}}</div>
             <div>
@@ -42,9 +59,9 @@
             </div>
           </ocj-list-item>
         </ocj-list>
-        <div v-for="(item, idx) in 200" :key="idx">
+        <!-- <div v-for="(item, idx) in 200" :key="idx">
           {{item}}
-        </div>
+        </div> -->
         <ocj-footer :list="footerList">
           <!-- <template slot="custom">
             <span>
@@ -71,6 +88,11 @@
         </ocj-footer>
       </div>
     </div>
+      <!-- <ocj-slide height="150">
+        <ocj-slide-item v-for="(item, index) in list" :key="index" :item-width="100">
+          <div class="item-class">{{ item.title }}</div>
+        </ocj-slide-item>
+      </ocj-slide> -->
 
     <!-- tag  -->
    <!-- <div class="tags">
@@ -106,19 +128,18 @@
     <!-- <demo-component :inject-data="{list: list}" numForOneRow="2" rowHeight="210"></demo-component> -->
     <!-- <demo-component :inject-data="{list: list}" numForOneRow="1" rowHeight="170"></demo-component> -->
 
-    <!-- <OcjFilter :filterConfig="filterConfig" isActive="销量" :stick="true" @changeSort="changeSort">
-      <template slot="lists">
-        <demo-component :inject-data="{list: list}" align="center" numForOneRow="2" rowHeight="210"></demo-component>
-      </template>
+    <!-- <OcjFilter :filterConfig="filterConfig" active="price" active-color="#f0655d" stick @changeSort="changeSort">
+      <demo-component :inject-data="{list: list}" align="center" numForOneRow="2" rowHeight="210"></demo-component>
     </OcjFilter> -->
 
     <!-- 图文组合 -->
     <!-- <div class="graphic">
       <OcjGraphic
         :inject-data="{list: list}"
-        :imageSize="{width: 60, height: 60}"
-        rowHeight="105"
-        :numForOneRow="6"
+        :imageSize="{width: 60, height: 40}"
+        :numForOneRow="5"
+        rowHeight="80"
+        padding="10"
         showText
         @click="clickGraphic"
       ></OcjGraphic>
@@ -195,13 +216,8 @@ import OcjHeadline from '../package/headline/headline'
 import OcjCountDown from '../package/countDown/countDown'
 import OcjPdtList from '../package/pdtList/pdtList'
 import OcjAddress from '../package/address/address'
-import OcjFilter from '../package/filterComponent/filterComponent'
 import { AuthList } from './mock/menu.js'
-import OcjCarousel from '../package/carousel/carousel.vue'
 import OcjMock from '../package/mock/mock.vue'
-import OcjSlide from '../package/slide/slide.vue'
-import OcjSlideItem from '../package/slideItem/slideItem.vue'
-import OcjGraphic from '../package/graphic/graphic.vue'
 export default {
   name: 'App',
   components: {
@@ -210,12 +226,7 @@ export default {
     OcjHeadline,
     HelloWorld,
     OcjAddress,
-    OcjFilter,
-    OcjCarousel,
-    OcjMock,
-    OcjSlide,
-    OcjSlideItem,
-    OcjGraphic
+    OcjMock
   },
   filters: {
     useYn: function (value) {
@@ -252,9 +263,11 @@ export default {
           text: '添加'
         },
         {
+          iconPath: require('./assets/bianji.png'),
           text: '减少'
         },
         {
+          iconPath: require('./assets/bianji.png'),
           text: '减少1'
         }
       ],
@@ -353,7 +366,7 @@ export default {
           src: 'http://img0.imgtn.bdimg.com/it/u=4077062070,269348422&fm=26&gp=0.jpg',
           itemName: '松下(Panasonic) 多功能蒸烤箱',
           salePrice: '1180.25',
-          title: '低价拼团'
+          title: '低价拼团 低价拼团'
         },
         {
           firstImgUrl: 'https://cdnimg.ocj.com.cn/item_images/item/15/17/1705/15171705L.jpg',
@@ -407,40 +420,24 @@ export default {
       ],
       filterConfig: [
         {
-          name: '销量',
-          sort: 'n', // todo 修改Boolean 作为 type 处理
+          label: '销量',
           type: 'normal',
-          value: '',
-          activeTab: { // 换成 value 去处理
-            asc: '',
-            desc: 'orderdesc',
-            isActive: 'orderdesc'
-          }
+          value: 'order'
         },
         {
-          name: '新品',
-          sort: 'n',
+          label: '新品',
           type: 'normal',
-          activeTab: {
-            asc: '',
-            desc: 'sdatedesc',
-            isActive: 'sdatedesc'
-          }
+          value: 'sdate'
         },
         {
-          name: '价格',
-          sort: 'y',
-          type: 'normal',
-          activeTab: {
-            asc: 'priceasc',
-            desc: 'pricedesc',
-            isActive: ''
-          }
+          label: '价格',
+          type: 'sort',
+          value: 'price'
         },
         {
-          name: '筛选',
+          label: '筛选',
           type: 'filter',
-          activeTab: {}
+          value: 'filter'
         }
       ],
       pdtList: [
@@ -505,6 +502,9 @@ export default {
     itemClick (value) {
       console.log(value)
     },
+    tabClick (value) {
+      console.log(value)
+    },
     closeMenu () {
       this.showMenu = false
     },
@@ -554,6 +554,9 @@ export default {
     },
     handleSupernatantClick () {
       console.log('handleSupernatantClick')
+    },
+    testHandler () {
+      this.$refs.header.moreHandler()
     }
   }
 }
@@ -601,6 +604,7 @@ export default {
   height: 100%;
   padding-top: 44px;
   padding-bottom: 44px;
+  overflow-x: hidden;
   overflow-y: scroll;
   /*解决ios上滑动不流畅*/
   -webkit-overflow-scrolling: touch;

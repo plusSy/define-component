@@ -3,7 +3,8 @@
  * 地址管理组建
  * 2018/9/5
  */
-import OcjFilter from './filterComponent.vue'
+// import OcjFilter from './filterComponent.vue'
+import OcjFilter from './filter.vue'
 
 const components = [
   OcjFilter

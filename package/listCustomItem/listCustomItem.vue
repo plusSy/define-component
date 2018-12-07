@@ -1,10 +1,15 @@
 <template>
-  <div class="list-item-wrapper" 
+  <div class="list-custom-item-wrapper" 
     @touchstart="onTouchStart"
     @touchmove="onTouchMove"
   > 
-    <div class="list-item__container" :style="trackStyle">
-      <slot></slot>
+    <div class="list-custom-item__container" :style="trackStyle">
+      <div class="list-custom-item__left">
+        <slot name="left"></slot>
+      </div>
+      <div class="list-custom-item__right">
+        <slot name="right"></slot>
+      </div>
     </div>
     <div class="list-item__sliding" ref="sliding" :style="slidingStyle">
       <slot name="sliding"></slot>
@@ -14,7 +19,7 @@
 <script>
   import touchHelper from '../utils/touch.js'
   export default {
-    name: 'ocjListItem',
+    name: 'ocjListCustomItem',
     props: {
       /**
        * 是否允许列表元素滑动显示一系列的操作按钮
@@ -118,20 +123,23 @@
   }
 </script>
 <style lang="less" scoped>
-  .list-item-wrapper {
+  .list-custom-item-wrapper {
     position: relative;
     display: block;
     overflow: hidden;
     width: 100%;
     border-bottom: 1px solid #d9d9d9;
-    .list-item__container {
+    .list-custom-item__container {
       position: relative;
       width: 100%;
-      display: block;
+      display: flex;
       padding: 10px;
       background: #FFFFFF;
-      text-align: left;
+      justify-content: space-between;
+      align-items: center;
+      // text-align: left;
       z-index: 2;
+      font-size: 14px;
     }
     .list-item__sliding {
       position: absolute;

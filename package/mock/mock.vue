@@ -1,11 +1,11 @@
 <template>
   <div class="mock">
-    <ocj-group>
-      <ocj-group-item v-for="(item, index) in localData" :key="index">
+    <ocj-group :injectData="localData">
+      <!-- <ocj-group-item v-for="(item, index) in localData" :key="index">
         <div class="item">
           {{ item.title }}
         </div>
-      </ocj-group-item>
+      </ocj-group-item> -->
     </ocj-group>
   </div>
 </template>
@@ -32,6 +32,7 @@ export default {
   },
   created () {
     this.localData = this.injectData.list
+    console.log(this.localData)
   },
   methods: {}
 }

@@ -8,7 +8,7 @@ const components = [
   Graphic
 ]
 
-const Graphics = {
+const graphicsInstall = {
   install: function (Vue) {
     components.map(function (item) {
       Vue.component(item.name, item)
@@ -20,6 +20,6 @@ const Graphics = {
   }
 }
 
-export default Graphics
+export default graphicsInstall
 
-export const config = Graphics.config
+export const config = graphicsInstall.config

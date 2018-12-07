@@ -15,7 +15,9 @@
         "less": "^3.8.1",
         "less-loader": "^4.1.0",
         "normalize.css": "^8.0.0",
+        "popper.js": "^1.14.6",
         "vue": "^2.5.2",
+        "vue-popper": "^0.3.8",
         "vue-touch": "^2.0.0-beta.4"
     },
     "devDependencies": {

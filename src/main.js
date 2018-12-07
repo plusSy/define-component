@@ -20,6 +20,7 @@ import sideMenu from '../package/sideMenu'
 import header from '../package/header'
 import footer from '../package/footer'
 import tabs from '../package/tabs'
+import tab from '../package/tab'
 import cardSwipe from '../package/cardSwipe'
 import cardItem from '../package/cardItem'
 import table from '../package/table'
@@ -29,6 +30,12 @@ import listItem from '../package/listItem'
 import modal from '../package/modal'
 import tags from '../package/tags'
 import tag from '../package/tag'
+import popover from '../package/popover'
+import ocjFilter from '../package/filterComponent'
+import listCustomItem from '../package/listCustomItem'
+import carousel from '../package/carousel'
+import slide from '../package/slide'
+import slideItem from '../package/slideItem'
 
 Grid.config.remProportion = 10
 Grid.config.designWidth = 375
@@ -52,6 +59,7 @@ Vue.use(sideMenu)
 Vue.use(header)
 Vue.use(footer)
 Vue.use(tabs)
+Vue.use(tab)
 Vue.use(cardSwipe)
 Vue.use(cardItem)
 Vue.use(table)
@@ -61,6 +69,12 @@ Vue.use(listItem)
 Vue.use(modal)
 Vue.use(tags)
 Vue.use(tag)
+Vue.use(popover)
+Vue.use(ocjFilter)
+Vue.use(listCustomItem)
+Vue.use(carousel)
+Vue.use(slide)
+Vue.use(slideItem)
 
 Object.keys(Filters).forEach(key => {
   Vue.filter(key, Filters[key])

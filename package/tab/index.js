@@ -1,20 +1,22 @@
-import OcjCarousel from './carousel'
-const components = [
-  OcjCarousel
-]
+/**
+ * Candice
+ * 页签item
+ * 2018/11/29
+ */
+import OcjTab from './tab.vue'
 
-const carouselInit = {
+const components = [
+  OcjTab
+]
+const tabInstall = {
   install: function (Vue) {
     components.map(function (item) {
       Vue.component(item.name, item)
     })
   },
-  config: {},
   init: function () {
     return this
   }
 }
 
-export default carouselInit
-
-export const config = carouselInit.config
+export default tabInstall

@@ -24,10 +24,9 @@
     </div>
 </template>
 <script>
-  import touch from '../mixins/touch.js'
+  import touchHelper from '../utils/touch.js'
   export default {
     name: 'ocjCardSwipe',
-    mixins: [touch],
     props: {
       /**
        * 容器宽度
@@ -95,11 +94,14 @@
       }
     },
     computed: {
+      $touch() {
+        return new touchHelper()
+      },
       count() {
         return this.swipes.length;
       },
       size() {
-        return this[this.vertical ? 'computedHeight' : 'computedWidth'];
+        return this[this.$touch.vertical ? 'computedHeight' : 'computedWidth'];
       },
       trackSize() {
         return this.count * this.size;
@@ -137,20 +139,20 @@
       },
       // 切换卡片手势开始
       onTouchStart (event) {
-        this.touchStart(event)
+        this.$touch.touchStart(event)
       },
       // 切换卡片手势移动
       onTouchMove (event) {
-        this.touchMove(event)
-        if ((this.vertical && this.direction === 'vertical') || this.direction === 'horizontal') {
+        this.$touch.touchMove(event)
+        if ((this.$touch.vertical && this.$touch.direction === 'vertical') || this.$touch.direction === 'horizontal') {
           event.preventDefault()
           event.stopPropagation()
         }
       },
       // 切换卡片手势结束
       onTouchEnd (event) {
-        let deltaLength = this.vertical ? this.deltaY : this.deltaX
-        let offsetLength = this.vertical ? this.offsetY : this.offsetX
+        let deltaLength = this.$touch.vertical ? this.$touch.deltaY : this.$touch.deltaX
+        let offsetLength = this.$touch.vertical ? this.$touch.offsetY : this.$touch.offsetX
         if (deltaLength > 0 && offsetLength > this.threshold) {
           this.swiping = this.active !== 0
           this.active === 0 ? (this.loop ? this.active = this.count - 1 : this.active) : this.active--

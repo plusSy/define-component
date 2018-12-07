@@ -1,0 +1,298 @@
+<template>
+  <div
+    class="carousel"
+    @touchstart="touchstart"
+    @touchmove="touchmove"
+    @touchend="touchend"
+    @mouseenter="hoverFn"
+    @mouseleave="hoverFn"
+    :style="carouselStyle"
+    :class="{carouselClass}"
+  >
+    <div
+      class="localdata-container"
+      :style="`
+        width: ${len * 100}%;
+        transform: translate(-${ activeIndex * 100 / len }%);
+        transition: ${ isResetIndex ? '' : transitionInterval / 1000 }s ease;
+      `"
+    >
+      <div
+        class="img-item"
+        v-for="(img, i) in localdataComputed"
+        :style="`width: ${100 / len}%;backgroundImage: url(${img.src});`"
+        :href="img.href ? img.href : false"
+        :key="i"
+      >
+      </div>
+    </div>
+    <template v-if="controllable">
+      <div class="prev" @click="switchFn" onselectstart="return false">&lt;</div>
+      <div class="next" @click="switchFn" onselectstart="return false">&gt;</div>
+    </template>
+    <template v-if="showDocts">
+      <ul class="dots" @click="activeDotFn">
+        <li
+          class="dot"
+          v-for="n in (len-2)"
+          :key="n"
+          :data-dot-index="n"
+          :class="{'active-dot': activeIndex === n}"
+        ></li>
+      </ul>
+    </template>
+  </div>
+</template>
+
+<script>
+import { pixelToRem } from '../rem'
+import touch from '../mixins/touch'
+
+export default {
+  name: 'OcjCarousel',
+  mixins: [touch],
+  props: {
+    InjectData: {
+      type: Object,
+      required: true,
+      default: () => {
+        return { list: [] }
+      }
+    },
+    /* 定时间隔 */
+    interval: {
+      type: [Number, String],
+      default: 5000
+    },
+    height: {
+      type: [Number, String],
+      default: 200
+    },
+    /* 左右的控制器 */
+    controllable: {
+      type: Boolean,
+      default: false
+    },
+    /* 展示dots */
+    showDocts: {
+      type: Boolean,
+      default: true
+    },
+    /* 是否自动轮播 */
+    autoPlay: {
+      type: [Boolean, String],
+      default: true
+    },
+    /* 过渡动画时长 */
+    transitionInterval: {
+      type: [Number, String],
+      default: 500
+    },
+    /* 当前显示第几张 */
+    currentPage: {
+      type: [Number, String],
+      default: 1
+    },
+    /* class */
+    carouselClass: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    },
+    // 滑动长度阙值 4 为 1/4
+    limit: {
+      type: [Number, String],
+      default: 4
+    }
+  },
+  data () {
+    return {
+      localdata: [],
+      timer: null,
+      isTransitioning: false, // 是否正在过度动画
+      isResetIndex: false, // 是否为瞬间重置定位，在watch中初始化，重定位会取消transition动画
+      activeIndex: this.currentPage,
+      startPos: {}, // 开始位置
+      endPos: {}, // 结束位置
+      scrollDirection: 0, // 滚动方向
+      touch: {} // 记录触碰节点
+    }
+  },
+  computed: {
+    // 为了无缝滚动，在传进来的localdata数组首部增加末尾元素，在尾部追加首元素
+    localdataComputed () {
+      var firstImg = this.localdata[0]
+      var lastImg = this.localdata[this.localdata.length - 1]
+      return [lastImg].concat(this.localdata, [firstImg])
+    },
+    len () {
+      return this.localdataComputed.length
+    },
+    carouselStyle () {
+      return `
+        height: ${pixelToRem(this.height)}rem;
+      `
+    }
+  },
+  beforeDestory () {
+    clearInterval(this.timer)
+  },
+  methods: {
+    // dot 切换item
+    activeDotFn (e) {
+      if (this.timer) clearInterval(this.timer)
+      if (e.target.tagName.toLowerCase() === 'li') {
+        let index = parseInt(e.target.getAttribute('data-dot-index'))
+        this.activeIndex = index
+      }
+      this.startInterval()
+    },
+    // 左右切换item
+    switchFn (e) {
+      if (this.isTransitioning) return // 动画过渡中不可以进行切换
+      e.target.className.indexOf('next') !== -1 ? this.activeIndex++ : this.activeIndex--
+    },
+    // 自动轮播
+    startInterval () {
+      if (this.autoPlay) {
+        this.timer = setInterval(() => {
+          this.activeIndex++
+        }, this.interval)
+      }
+    },
+    // 鼠标事件处理
+    hoverFn (e) {
+      if (e.type === 'mouseenter') {
+        if (this.timer) clearInterval(this.timer)
+      } else {
+        this.startInterval()
+      }
+    },
+    touchstart (e) {
+      if (this.timer) clearInterval(this.timer)
+      this.touch = e.targetTouches[0]
+      this.startPos = {x: this.touch.pageX, y: this.touch.pageY}
+      this.scrollDirection = 0
+    },
+    touchmove (e) {
+      let { touch, startPos } = this
+      let currentWidth = e.currentTarget.clientWidth / this.limit
+      if (event.targetTouches.length > 1) { return }
+      touch = e.targetTouches[0]
+      this.endPos = {x: touch.pageX, y: touch.pageY}
+      // 判断滑动距离超过当前元素的limit长度计算出滑动方向，向右为1，向左为-1
+      this.scrollDirection = touch.pageX - startPos.x > currentWidth ? 1 : touch.pageX - startPos.x < -currentWidth ? -1 : 0
+    },
+    touchend (e) {
+      let { scrollDirection, activeIndex, localdata } = this
+      if (scrollDirection === 1) {
+        if (activeIndex >= 1 && activeIndex <= localdata.length) {
+          this.activeIndex--
+        }
+      } else if (scrollDirection === -1) {
+        if (activeIndex >= 0 && activeIndex <= localdata.length) {
+          this.activeIndex++
+        }
+      } else {
+        return
+      }
+      this.startInterval()
+    }
+  },
+  created () {
+    this.localdata = this.InjectData.list
+  },
+  mounted () {
+    this.startInterval()
+  },
+  watch: {
+    activeIndex (newActiveIndex, oldActiveIndex) {
+      // 无缝滚动
+      if ((newActiveIndex === 1 && oldActiveIndex === (this.len - 1)) || (oldActiveIndex === 0 && newActiveIndex === this.len - 2)) {
+        this.isResetIndex = true
+        return
+      }
+      this.isResetIndex = false
+      this.isTransitioning = true
+      setTimeout(() => {
+        // 瞬间归位需要取消transition过渡
+        if (this.activeIndex === 0) {
+          this.activeIndex = this.len - 2
+        } else if (this.activeIndex === (this.len - 1)) {
+          this.activeIndex = 1
+        }
+        this.isTransitioning = false
+      }, this.transitionInterval)
+    }
+  }
+}
+</script>
+
+<style lang="css" scoped>
+.carousel {
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+}
+.carousel:hover .prev,
+.next {
+  display: block;
+}
+
+.localdata-container {
+  height: 100%;
+}
+
+.img-item {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background: #ccc no-repeat center/cover;
+  line-height: 16;
+}
+
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  font-size: 30px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  font-weight: 200;
+  line-height: 80px;
+}
+.prev {
+  left: 4%;
+}
+.next {
+  right: 4%;
+}
+.dots {
+  display: table;
+  margin: 0 auto;
+  transform: translateY(-200%);
+}
+.dot {
+  width: 12px;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 15px;
+  height: 2px;
+  margin-right: 6px;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+.dot:last-child {
+  margin-right: 0px;
+}
+.active-dot {
+  background-color: rgba(122, 117, 117, 1);
+  transition: 200ms;
+}
+</style>
