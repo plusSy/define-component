@@ -1,10 +1,14 @@
-
-import OcjTips from './tips.vue'
+/**
+ * Candice
+ * 2018/12/7
+ * 分页
+ */
+import OcjPagination from './pagination.vue'
 
 const components = [
-  OcjTips
+  OcjPagination
 ]
-const tipsInstall = {
+const paginationInstall = {
   install: function (Vue) {
     components.map(function (item) {
       Vue.component(item.name, item)
@@ -15,4 +19,4 @@ const tipsInstall = {
   }
 }
 
-export default tipsInstall
+export default paginationInstall

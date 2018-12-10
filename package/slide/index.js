@@ -8,7 +8,7 @@ import OcjSlide from './slide.vue'
 const components = [
   OcjSlide
 ]
-const slideInit = {
+const slideInstall = {
   install: function (Vue) {
     components.map(function (item) {
       Vue.component(item.name, item)
@@ -19,4 +19,4 @@ const slideInit = {
   }
 }
 
-export default slideInit
+export default slideInstall

@@ -4,7 +4,7 @@
  * 2018/9/5
  */
 // import OcjFilter from './filterComponent.vue'
-import OcjFilter from './filter.vue'
+import OcjFilter from './loop.vue'
 
 const components = [
   OcjFilter

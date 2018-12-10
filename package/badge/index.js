@@ -1,20 +1,21 @@
-import OcjCarousel from './carousel'
-const components = [
-  OcjCarousel
-]
+/**
+ * badge 标记数
+*/
 
-const carouselInstall = {
+import OcjBadge from './badge.vue'
+
+const components = [
+  OcjBadge
+]
+const badgeInstall = {
   install: function (Vue) {
     components.map(function (item) {
       Vue.component(item.name, item)
     })
   },
-  config: {},
   init: function () {
     return this
   }
 }
 
-export default carouselInstall
-
-export const config = carouselInstall.config
+export default badgeInstall

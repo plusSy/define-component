@@ -36,6 +36,8 @@ import listCustomItem from '../package/listCustomItem'
 import carousel from '../package/carousel'
 import slide from '../package/slide'
 import slideItem from '../package/slideItem'
+import pagination from '../package/pagination'
+import badge from '../package/badge'
 
 Grid.config.remProportion = 10
 Grid.config.designWidth = 375
@@ -75,6 +77,8 @@ Vue.use(listCustomItem)
 Vue.use(carousel)
 Vue.use(slide)
 Vue.use(slideItem)
+Vue.use(pagination)
+Vue.use(badge)
 
 Object.keys(Filters).forEach(key => {
   Vue.filter(key, Filters[key])

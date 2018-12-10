@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <ocj-date-picker :value="currentDate"></ocj-date-picker> -->
-    <ocj-side-menu  ref="sideMenu" direction="right" :wrapTarget="wrapTarget" :menuList="menuList" @closeMenu="closeMenu" @openMenu="openMenu"></ocj-side-menu>
+    <!-- <ocj-side-menu  ref="sideMenu" direction="right" :wrapTarget="wrapTarget" :menuList="menuList" @closeMenu="closeMenu" @openMenu="openMenu"></ocj-side-menu>
     <ocj-modal ref="modal" direction="right" backgroundColor="#ffffff" :wrapTarget="wrapTarget" @closeModal="closeModal" @openModal="openModal">
       <button @click="headerFilterHandler">过滤条件</button>
     </ocj-modal>
@@ -13,24 +13,60 @@
           <div style="height: 30px; line-height: 30px;">跳转</div>
         </div>
       </ocj-header>
-      <div class="container">
+      <div class="container"> -->
         <!-- <ocj-tabs :currentTab="currentTab" :tabs="tabs" :sticky="true" :scrollable="false"></ocj-tabs> -->
-        <ocj-tabs :sticky="true" :scrollable="false" @tab-click="tabClick">
+        <!-- <ocj-tabs :sticky="true" :scrollable="false" @tab-click="tabClick">
           <ocj-tab value="baseInfo"><span slot="label"><img src="./assets/stop.png"/>基础配置</span></ocj-tab>
-          <ocj-tab value="attr" label="属性设置" :disabled="false">属性设置</ocj-tab>
+          <ocj-tab value="attr" label="属性设置" :disabled="false">属性设置</ocj-tab> -->
           <!-- <ocj-tab value="attr1" label="基础配置1"></ocj-tab>
           <ocj-tab value="attr2" label="属性设置1"></ocj-tab>
           <ocj-tab value="attr3" label="属性设置3"></ocj-tab> -->
-        </ocj-tabs>
+        <!-- </ocj-tabs> -->
         <!-- <OcjMock :injectData="{list: list}"></OcjMock>
         <OcjCarousel :injectData="list" height="200" interval="2000" showDocts></OcjCarousel> -->
-        <ocj-slide height="150" scrollType="progress">
+        <!-- <ocj-slide height="150" scrollType="progress">
           <ocj-slide-item v-for="(item, index) in list" :key="index" :item-width="100">
             <div class="item-class">{{ item.title }}</div>
           </ocj-slide-item>
-        </ocj-slide>
+        </ocj-slide> -->
+        <div class="badges">
+          <div class="badge-test">
+            <ocj-badge type="dot" className="base-position"></ocj-badge>
+          </div>
 
-        <ocj-card-swipe :height="150" :loop="true" :showIndicators="false" indicatorClass="indicatorClass">
+          <div class="badge-test">
+            <ocj-badge type="count" className="base-position" count="349" :offset="[0, 10]"></ocj-badge>
+          </div>
+
+          <div class="badge-test"><ocj-badge type="text" className="base-position" text="hello word"></ocj-badge></div>
+
+          <ocj-badge type="count" count="349" backgroundColor="green" overflowCount="120" :offset="[0, 10]"></ocj-badge>
+
+          <ocj-badge type="count" count="349" overflowCount="120"></ocj-badge>
+        </div>
+
+        <!-- tag  -->
+        <!-- <div class="tags">
+          <ocj-tag type="circle" radius="11" color="#666666" textClass="tag-class" @click="handleSupernatantClick">new标签</ocj-tag>
+          <ocj-tag type="square"  @click="handleSupernatantClick">old标签</ocj-tag>
+
+          <div class="inner-class">
+            一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品
+            <ocj-tags direction="row" justifyContent="start" alignItems="end">
+                <ocj-tag textClass="define-tag" order="3" placement="start" @click="handleSupernatantClick">标签</ocj-tag>
+                <ocj-tag type="image" placement="center" @click="handleSupernatantClick">
+                  <img class="img-class" src="./assets/bianji.png" alt="">
+                </ocj-tag>
+                <ocj-tag textClass="define-tag" order="1" placement="end" @click="handleSupernatantClick">标签</ocj-tag>
+            </ocj-tags>
+          </div>
+        </div> -->
+
+        <OcjFilter :filterConfig="filterConfig" active="price" active-color="#f0655d" :stick="true" @changeSort="changeSort">
+          <demo-component :inject-data="{list: list}" align="center" numForOneRow="2" rowHeight="310"></demo-component>
+        </OcjFilter>
+
+        <!-- <ocj-card-swipe :height="150" :loop="true" :showIndicators="false" indicatorClass="indicatorClass">
           <ocj-card-item v-for="(number, nIdx) in 5" :key="nIdx">
             <div class="card-content">
               {{number}}
@@ -38,6 +74,7 @@
           </ocj-card-item>
         </ocj-card-swipe>
         <ocj-date-picker :value="currentDate" :single="false" :autoComplete="true"></ocj-date-picker>
+        <ocj-pagination :pageSize="20" :total="100" @sizeChange="handleSizeChange"></ocj-pagination>
         <ocj-table :border="true" :data="tableList" :columns="columns"></ocj-table>
         <ocj-list>
           <ocj-list-custom-item :hasSliding="true">
@@ -58,11 +95,11 @@
               <div style="display:inline-flex;width:75px; height: 100%; background-color: #E56D03;color:#ffffff;font-size:13px;justify-content: center;align-items: center;">操作日志</div>
             </div>
           </ocj-list-item>
-        </ocj-list>
+        </ocj-list> -->
         <!-- <div v-for="(item, idx) in 200" :key="idx">
           {{item}}
         </div> -->
-        <ocj-footer :list="footerList">
+        <!-- <ocj-footer :list="footerList"> -->
           <!-- <template slot="custom">
             <span>
             <img src="./assets/stop.png"/>
@@ -85,31 +122,14 @@
             <div>减少</div>
           </span>
           </template> -->
-        </ocj-footer>
+        <!-- </ocj-footer>
       </div>
-    </div>
+    </div> -->
       <!-- <ocj-slide height="150">
         <ocj-slide-item v-for="(item, index) in list" :key="index" :item-width="100">
           <div class="item-class">{{ item.title }}</div>
         </ocj-slide-item>
       </ocj-slide> -->
-
-    <!-- tag  -->
-   <!-- <div class="tags">
-      <ocj-tag type="circle" radius="11" color="#666666" textClass="tag-class" @click="handleSupernatantClick">new标签</ocj-tag>
-      <ocj-tag type="square"  @click="handleSupernatantClick">old标签</ocj-tag>
-
-      <div class="inner-class">
-        一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品一个商品
-      <ocj-tags direction="row" justifyContent="start" alignItems="end">
-          <ocj-tag textClass="define-tag" order="3" placement="start" @click="handleSupernatantClick">标签</ocj-tag>
-          <ocj-tag type="image" placement="center" @click="handleSupernatantClick">
-            <img class="img-class" src="./assets/bianji.png" alt="">
-          </ocj-tag>
-          <ocj-tag textClass="define-tag" order="1" placement="end" @click="handleSupernatantClick">标签</ocj-tag>
-      </ocj-tags>
-      </div>
-   </div> -->
 
     <!-- @saveAddress // 保存地址
       @delAddress // 删除地址
@@ -127,10 +147,6 @@
 
     <!-- <demo-component :inject-data="{list: list}" numForOneRow="2" rowHeight="210"></demo-component> -->
     <!-- <demo-component :inject-data="{list: list}" numForOneRow="1" rowHeight="170"></demo-component> -->
-
-    <!-- <OcjFilter :filterConfig="filterConfig" active="price" active-color="#f0655d" stick @changeSort="changeSort">
-      <demo-component :inject-data="{list: list}" align="center" numForOneRow="2" rowHeight="210"></demo-component>
-    </OcjFilter> -->
 
     <!-- 图文组合 -->
     <!-- <div class="graphic">
@@ -557,6 +573,9 @@ export default {
     },
     testHandler () {
       this.$refs.header.moreHandler()
+    },
+    handleSizeChange (val) {
+      console.log(`每页${val}条`)
     }
   }
 }
@@ -629,7 +648,6 @@ export default {
   width: 100px;
   height: 130px;
   background-color: antiquewhite;
-  margin-top: 40px;
 }
 .item-class{
   width: 100%;
@@ -660,5 +678,27 @@ export default {
 .tag-class{
   color: #000;
   padding: 3px 15px;
+}
+.badges{
+  height: 100px;
+  width: 100%;
+  border-bottom: 1px solid;
+  border-top: 1px solid;
+  text-align: left;
+}
+.badge-test{
+  display: inline-block;
+  width: 70px;
+  height: 30px;
+  margin: 20px auto 0;
+  border: none;
+  border-radius: 4px;
+  background-color: #666666;
+  position: relative;
+}
+.base-position{
+  position: absolute;
+  top: -0.5em;
+  right: -0.5em;
 }
 </style>
