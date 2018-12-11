@@ -1,53 +1,67 @@
 <template>
   <div class="mock">
-    <ocj-group :injectData="localData">
-      <!-- <ocj-group-item v-for="(item, index) in localData" :key="index">
-        <div class="item">
-          {{ item.title }}
-        </div>
-      </ocj-group-item> -->
-    </ocj-group>
+    <div class="currentY-view">
+      range: {{ range }}
+    </div>
+    <ocjLoop @loadMoreStatus="handleLoadMore" @refreshStatus="handleRefresh" @ceilStatus="handleCeil">
+      <div class="item" v-for="index in range" :key="index">{{ index }}</div>
+    </ocjLoop>
   </div>
 </template>
 
 <script>
-import OcjGroup from './group'
-import OcjGroupItem from './group-item'
-
+import OcjLoop from './loop.vue'
 export default {
-  name: 'graphic',
-  components: { OcjGroup, OcjGroupItem },
-  props: {
-    injectData: {
-      type: [Object],
-      default: () => {
-        return {}
-      }
-    }
-  },
+  name: 'Mock',
+  components: { OcjLoop },
   data () {
     return {
-      localData: []
+      range: 100,
+      timer: null
     }
   },
-  created () {
-    this.localData = this.injectData.list
-    console.log(this.localData)
-  },
-  methods: {}
+  methods: {
+    refresh () {
+      this.timer = setTimeout(() => {
+        this.range = this.range + 50
+      }, 3000)
+    },
+    handleLoadMore (status) {
+      if (status) {
+        this.refresh()
+        console.log('加载更多')
+      } else {
+        console.log('清除加载项')
+        clearTimeout(this.timer)
+      }
+    },
+    handleRefresh (status) {
+      return status ? console.log('顶部') : ''
+    },
+    handleCeil (status) {
+      return status ? console.log('吸顶') : ''
+    }
+  }
 }
 </script>
 
 <style lang="css" scoped>
 .mock {
   width: 100%;
-  height: 150px;
-  background-color: antiquewhite;
 }
 .item{
-  height: 100%;
+  height: 40px;
   width: 100%;
-  line-height: 150px;
-  border-right: 1px solid;
+  line-height: 40px;
+  border-bottom: 1px solid;
+}
+.currentY-view{
+  position: fixed;
+  top: 0px;
+  left: 20px;
+  padding: 5px 15px;
+  background-color: cornflowerblue;
+  border-radius: 3px;
+  color: #ffffff;
 }
 </style>

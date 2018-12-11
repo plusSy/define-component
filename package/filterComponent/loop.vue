@@ -133,6 +133,10 @@ export default {
     isBottom () {
       return this.offsetY < Number(this.range)
     },
+    // 是否触顶
+    isTop () {
+      return (this.offsetY + this.offsetTop) < Number(this.range)
+    },
     // Y方向偏移量
     offsetY () {
       return this.filterLoopHeight + this.offsetTop - this.windowHeight - this.pageYOffset

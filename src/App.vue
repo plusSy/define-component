@@ -45,6 +45,8 @@
           <ocj-badge type="count" count="349" overflowCount="120"></ocj-badge>
         </div>
 
+        <OcjMock></OcjMock>
+
         <!-- tag  -->
         <!-- <div class="tags">
           <ocj-tag type="circle" radius="11" color="#666666" textClass="tag-class" @click="handleSupernatantClick">new标签</ocj-tag>
@@ -62,9 +64,9 @@
           </div>
         </div> -->
 
-        <OcjFilter :filterConfig="filterConfig" active="price" active-color="#f0655d" :stick="true" @changeSort="changeSort">
+        <!-- <OcjFilter :filterConfig="filterConfig" active="price" active-color="#f0655d" :stick="true" @changeSort="changeSort">
           <demo-component :inject-data="{list: list}" align="center" numForOneRow="2" rowHeight="310"></demo-component>
-        </OcjFilter>
+        </OcjFilter> -->
 
         <!-- <ocj-card-swipe :height="150" :loop="true" :showIndicators="false" indicatorClass="indicatorClass">
           <ocj-card-item v-for="(number, nIdx) in 5" :key="nIdx">
