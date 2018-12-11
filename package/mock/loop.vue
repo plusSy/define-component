@@ -60,6 +60,7 @@ export default {
       this.contentScrollHeight = contentScrollHeight
     },
     handleScroll () {
+      this.computeDom()
       // 当前位置
       // this.currentY = this.containerScrollHeight + this.containerOffsetTop - this.screenHeight - window.scrollY
       this.currentY = window.scrollY
@@ -74,6 +75,7 @@ export default {
       this.$emit('ceilStatus', this.isCeil)
     },
     handleResize () {
+      this.computeDom()
       console.log('size change')
     },
     getHeight () {

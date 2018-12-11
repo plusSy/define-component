@@ -23,7 +23,9 @@ export default {
   methods: {
     refresh () {
       this.timer = setTimeout(() => {
-        this.range = this.range + 50
+        this.$nextTick(() => {
+          this.range = this.range + 50
+        })
       }, 3000)
     },
     handleLoadMore (status) {
